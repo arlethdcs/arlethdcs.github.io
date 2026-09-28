@@ -14,12 +14,12 @@
 // w/h = dimensiones reales del archivo; reservan espacio y evitan
 // saltos de layout y parpadeo al hacer scroll.
 const PRODUCTS = [
-  { id: 1,  name: 'Custom Fashion T-Shirt',  price: 9.99,  img: 'images/kids-tshirt.png',  w: 665,  h: 665,  flag: 'New' },
-  { id: 3,  name: 'Custom Fashion Jeans',    price: 12.99, img: 'images/kids-jeans.jpg',  w: 750,  h: 999 },
-  { id: 4,  name: 'Custom Fashion Jacket',   price: 15.99, img: 'images/kids-coat.webp',  w: 1946, h: 2574 },
-  { id: 7,  name: 'Custom Fashion Sneakers', price: 18.99, img: 'images/kids-shoes.jpg',  w: 250,  h: 250,  flag: 'Best' },
-  { id: 13, name: 'Custom Fashion Boots',    price: 16.99, img: 'images/kids-boots.webp', w: 600,  h: 900,  flag: 'New' },
-  { id: 14, name: 'Custom Fashion Swimsuit', price: 10.99, img: 'images/kids-swimsuit.webp', w: 1800, h: 2600 }
+  { id: 1,  name: 'Custom Fashion T-Shirt',  price: 9.99,  img: 'images/kids-tshirt.png',  w: 1254, h: 1254, flag: 'New' },
+  { id: 3,  name: 'Custom Fashion Jeans',    price: 12.99, img: 'images/kids-jeans.png',  w: 1086, h: 1448 },
+  { id: 4,  name: 'Custom Fashion Jacket',   price: 15.99, img: 'images/kids-coat.png',   w: 1091, h: 1442 },
+  { id: 7,  name: 'Custom Fashion Sneakers', price: 18.99, img: 'images/kids-shoes.png',  w: 1254, h: 1254, flag: 'Best' },
+  { id: 13, name: 'Custom Fashion Boots',    price: 16.99, img: 'images/kids-boots.png',  w: 1024, h: 1536, flag: 'New' },
+  { id: 14, name: 'Custom Fashion Swimsuit', price: 10.99, img: 'images/kids-swimsuit.png', w: 1024, h: 1536 }
 ];
 
 // Second collection: More Colors (photos from the "more colors" folder)
