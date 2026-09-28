@@ -1,0 +1,87 @@
+# ============================================================
+#   CUSTOM FASHION - Kids Fashion Collection
+#   Proyecto web estatico (HTML5 / CSS3 / JavaScript)
+# ============================================================
+
+# ---------- Sistema operativo ----------
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.AppleDouble
+.LSOverride
+Icon?
+
+# ---------- Editores de codigo ----------
+.vscode/
+.idea/
+*.code-workspace
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+.classpath
+.factorypath
+
+# ---------- Sistema / compilacion ----------
+Thumbs.db
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+*.log
+
+# ---------- Dependencias ----------
+# (si mas adelante agregas package.json / node_modules)
+node_modules/
+jspm_packages/
+bower_components/
+vendor/
+.pnp
+.pnp.js
+
+# ---------- Builds y distributables ----------
+# (si anades bundlers como Vite, Webpack, Parcel, etc.)
+dist/
+build/
+out/
+.output/
+.next/
+.nuxt/
+.svelte-kit/
+.cache/
+.parcel-cache/
+*.min.js
+*.min.css
+*.map
+
+# ---------- Variables de entorno y secretos ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+
+# ---------- Sistema de versionado ----------
+# .git/ nunca se versiona (ya lo gestiona Git)
+
+# ---------- Exclusiones especificas del proyecto ----------
+# Carpeta de origen con las fotos originales.
+# Las copias que usa la web viven en /images, por lo que
+# esta carpeta puede excluirse del repositorio si lo prefieres.
+# Descomenta la linea para activarlo:
+# fashion 31/
+# more colors/
