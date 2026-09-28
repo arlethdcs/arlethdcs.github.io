@@ -11,26 +11,27 @@
    ------------------------------------------------------------ */
 
 // Main collection products. Real photos only.
-// Para añadir más, agrega un objeto aquí.
+// w/h = dimensiones reales del archivo; reservan espacio y evitan
+// saltos de layout y parpadeo al hacer scroll.
 const PRODUCTS = [
-  { id: 1,  name: 'Custom Fashion T-Shirt',    price: 9.99,  img: 'images/kids-tshirt.png',   flag: 'New' },
-  { id: 3,  name: 'Custom Fashion Jeans',      price: 12.99, img: 'images/kids-jeans.jpg' },
-  { id: 4,  name: 'Custom Fashion Jacket',     price: 15.99, img: 'images/kids-coat.webp' },
-  { id: 7,  name: 'Custom Fashion Sneakers',   price: 18.99, img: 'images/kids-shoes.jpg',   flag: 'Best' },
-  { id: 13, name: 'Custom Fashion Boots',      price: 16.99, img: 'images/kids-boots.webp',  flag: 'New' },
-  { id: 14, name: 'Custom Fashion Swimsuit',   price: 10.99, img: 'images/kids-swimsuit.webp' }
+  { id: 1,  name: 'Custom Fashion T-Shirt',  price: 9.99,  img: 'images/kids-tshirt.png',  w: 665,  h: 665,  flag: 'New' },
+  { id: 3,  name: 'Custom Fashion Jeans',    price: 12.99, img: 'images/kids-jeans.jpg',  w: 750,  h: 999 },
+  { id: 4,  name: 'Custom Fashion Jacket',   price: 15.99, img: 'images/kids-coat.webp',  w: 1946, h: 2574 },
+  { id: 7,  name: 'Custom Fashion Sneakers', price: 18.99, img: 'images/kids-shoes.jpg',  w: 250,  h: 250,  flag: 'Best' },
+  { id: 13, name: 'Custom Fashion Boots',    price: 16.99, img: 'images/kids-boots.webp', w: 600,  h: 900,  flag: 'New' },
+  { id: 14, name: 'Custom Fashion Swimsuit', price: 10.99, img: 'images/kids-swimsuit.webp', w: 1800, h: 2600 }
 ];
 
 // Second collection: More Colors (photos from the "more colors" folder)
 const THEORY_PRODUCTS = [
-  { id: 101, name: 'More Colors T-Shirt',   price: 8.99,  img: 'images/more-colors/tshirt.webp',      flag: 'New' },
-  { id: 102, name: 'More Colors Skirt',     price: 11.99, img: 'images/more-colors/skirt.webp' },
-  { id: 103, name: 'More Colors Dress',     price: 14.99, img: 'images/more-colors/dress.jpg',       flag: 'Best' },
-  { id: 104, name: 'More Colors Heels',     price: 12.99, img: 'images/more-colors/heels.jpg' },
-  { id: 105, name: 'More Colors Bag',       price: 13.99, img: 'images/more-colors/bag.webp' },
-  { id: 106, name: 'More Colors Cap',       price: 6.99,  img: 'images/more-colors/cap.jpg' },
-  { id: 107, name: 'More Colors Waterproof', price: 17.99, img: 'images/more-colors/waterproof.jpg' },
-  { id: 108, name: 'More Colors Deadem',    price: 13.99, img: 'images/more-colors/deadem.jpg' }
+  { id: 101, name: 'More Colors T-Shirt',   price: 8.99,  img: 'images/more-colors/tshirt.webp',     w: 512,  h: 637,  flag: 'New' },
+  { id: 102, name: 'More Colors Skirt',     price: 11.99, img: 'images/more-colors/skirt.webp',      w: 900,  h: 1342 },
+  { id: 103, name: 'More Colors Dress',     price: 14.99, img: 'images/more-colors/dress.jpg',       w: 900,  h: 1200, flag: 'Best' },
+  { id: 104, name: 'More Colors Heels',     price: 12.99, img: 'images/more-colors/heels.jpg',       w: 554,  h: 554 },
+  { id: 105, name: 'More Colors Bag',       price: 13.99, img: 'images/more-colors/bag.webp',        w: 668,  h: 886 },
+  { id: 106, name: 'More Colors Cap',       price: 6.99,  img: 'images/more-colors/cap.jpg',         w: 194,  h: 259 },
+  { id: 107, name: 'More Colors Waterproof', price: 17.99, img: 'images/more-colors/waterproof.jpg', w: 387,  h: 516 },
+  { id: 108, name: 'More Colors Deadem',    price: 13.99, img: 'images/more-colors/deadem.jpg',      w: 350,  h: 350 }
 ];
 
 const ALL_PRODUCTS = [...PRODUCTS, ...THEORY_PRODUCTS];
@@ -82,7 +83,9 @@ function cardTemplate(p) {
   return `
     <article class="product-card">
       <div class="card-media">
-        <img src="${p.img}" alt="${p.name}" loading="lazy" />
+        <img src="${p.img}" alt="${p.name}"
+             width="${p.w}" height="${p.h}"
+             decoding="async" fetchpriority="high" />
         ${p.flag ? `<span class="card-flag">${p.flag}</span>` : ''}
       </div>
       <div class="card-body">
