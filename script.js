@@ -64,28 +64,54 @@ function loadCart() {
 }
 
 function saveCart() {
-  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  } catch {
+    /* Modo privado, cuota agotada o almacenamiento bloqueado:
+       el carrito sigue funcionando en memoria durante la sesión. */
+  }
+}
+
+// Elimina del carrito los ids que ya no existen en el catálogo.
+// Sin esto, un producto retirado de PRODUCTS dejaba line.product
+//undefined y reventaba updateCartUI al abrir el carrito.
+function pruneCart() {
+  const before = cart.length;
+  cart = cart.filter((it) => ALL_PRODUCTS.some((p) => p.id === it.id));
+  if (cart.length !== before) saveCart();
 }
 
 /* ------------------------------------------------------------
    3. CATÁLOGO PAGINADO (reutilizable)
    ------------------------------------------------------------ */
 
-// Nº de columnas según el ancho (coincide con los breakpoints de CSS)
+// Nº de columnas según el ancho. Los breakpoints viven en una sola fuente
+// de verdad (MQ_DESKTOP / MQ_TABLET) compartida con las media queries de CSS.
+const MQ_DESKTOP = '(min-width: 1024px)';
+const MQ_TABLET  = '(min-width: 681px)';
+
+const mqDesktop = window.matchMedia(MQ_DESKTOP);
+const mqTablet  = window.matchMedia(MQ_TABLET);
+
 function getColumns() {
-  const w = window.innerWidth;
-  if (w >= 1024) return 4; // escritorio
-  if (w >= 681)  return 3; // tablet
-  return 2;                // celular
+  if (mqDesktop.matches) return 4; // escritorio
+  if (mqTablet.matches)  return 3; // tablet
+  return 2;                        // celular
 }
 
-function cardTemplate(p) {
+function cardTemplate(p, i) {
+  // Solo la primera imagen de la página es prioritaria: es la que entra
+  // en el viewport al cargar. El resto se pide bajo demanda.
+  const loading = i === 0 ? 'eager' : 'lazy';
+  const priority = i === 0 ? 'high' : 'auto';
+
   return `
     <article class="product-card">
       <div class="card-media">
         <img src="${p.img}" alt="${p.name}"
              width="${p.w}" height="${p.h}"
-             decoding="async" fetchpriority="high" />
+             loading="${loading}" fetchpriority="${priority}"
+             decoding="async" />
         ${p.flag ? `<span class="card-flag">${p.flag}</span>` : ''}
       </div>
       <div class="card-body">
@@ -98,48 +124,59 @@ function cardTemplate(p) {
 
 // Fabrica un catálogo paginado (grid + dots + flechas + swipe)
 function buildCatalog(cfg) {
-  const { gridEl, viewportEl, dotsEl, prevBtn, nextBtn, products } = cfg;
+  const { gridEl, viewportEl, dotsEl, prevBtn, nextBtn, products, label } = cfg;
   const state = { pageIndex: 0 };
+  let switchTimer = null;
 
   function ipp() {
     return getColumns() * ROWS_PER_PAGE;
   }
 
+  // Devuelve siempre al menos una página: así paint() nunca recibe
+  // un array vacío y no hay que comprobar el caso en todas partes.
   function pages() {
     const out = [];
     const size = ipp();
     for (let i = 0; i < products.length; i += size) {
       out.push(products.slice(i, i + size));
     }
-    return out;
+    return out.length ? out : [[]];
   }
 
-  function render() {
+  // Pintado inmediato, sin transición. Es lo que se usa en la primera
+  // carga y al redimensionar, donde una animación solo produce parpadeo.
+  function paint() {
     const allPages = pages();
     if (state.pageIndex > allPages.length - 1) state.pageIndex = allPages.length - 1;
+    if (state.pageIndex < 0) state.pageIndex = 0;
 
-    gridEl.classList.add('switching');
-
-    window.setTimeout(() => {
-      gridEl.innerHTML = allPages[state.pageIndex].map(cardTemplate).join('');
-      gridEl.classList.remove('switching');
-    }, 210);
+    const items = allPages[state.pageIndex];
+    gridEl.innerHTML = items.map((p, i) => cardTemplate(p, i)).join('');
 
     dotsEl.innerHTML = allPages.length <= 1
       ? ''
       : Array.from({ length: allPages.length }, (_, i) =>
-          `<button class="dot${i === state.pageIndex ? ' active' : ''}" data-page="${i}" aria-label="Page ${i + 1}"></button>`
+          `<button class="dot${i === state.pageIndex ? ' active' : ''}" data-page="${i}" aria-label="${label} page ${i + 1} of ${allPages.length}" aria-current="${i === state.pageIndex ? 'true' : 'false'}"></button>`
         ).join('');
 
     prevBtn.disabled = state.pageIndex <= 0;
     nextBtn.disabled = state.pageIndex >= allPages.length - 1 || allPages.length <= 1;
   }
 
+  // Cambio de página con la transición de desvanecido.
   function goTo(index) {
     const allPages = pages();
     if (index < 0 || index > allPages.length - 1) return;
     state.pageIndex = index;
-    render();
+
+    window.clearTimeout(switchTimer);
+    gridEl.classList.add('switching');
+    switchTimer = window.setTimeout(paint, 210);
+
+    viewportEl.setAttribute(
+      'aria-label',
+      `${label}, page ${index + 1} of ${allPages.length}`
+    );
   }
 
   prevBtn.addEventListener('click', () => goTo(state.pageIndex - 1));
@@ -179,8 +216,8 @@ function buildCatalog(cfg) {
     if (addBtn) addToCart(Number(addBtn.dataset.id));
   });
 
-  render();
-  return { render, goTo, ipp };
+  paint();
+  return { goTo, repaint: paint };
 }
 
 const catalogs = [];
@@ -190,7 +227,8 @@ const catalogMain = buildCatalog({
   dotsEl:     $('#catalogDots'),
   prevBtn:    $('#prevBtn'),
   nextBtn:    $('#nextBtn'),
-  products:   PRODUCTS
+  products:   PRODUCTS,
+  label:      'Fashion 31'
 });
 catalogs.push(catalogMain);
 
@@ -200,7 +238,8 @@ const catalogTheory = buildCatalog({
   dotsEl:     $('#theoryDots'),
   prevBtn:    $('#theoryPrevBtn'),
   nextBtn:    $('#theoryNextBtn'),
-  products:   THEORY_PRODUCTS
+  products:   THEORY_PRODUCTS,
+  label:      'More Colors'
 });
 catalogs.push(catalogTheory);
 
@@ -260,10 +299,23 @@ function cartSubtotal() {
 }
 
 function cartLines() {
-  return cart.map((item) => {
-    const p = findProduct(item.id);
-    return { ...item, product: p };
-  });
+  return cart
+    .map((item) => ({ ...item, product: findProduct(item.id) }))
+    .filter((line) => line.product); // ids retirados del catálogo
+}
+
+function flashAdded(btn) {
+  if (!btn || btn.dataset.busy === '1') return;
+
+  btn.dataset.busy = '1';
+  btn.textContent = 'Added \u2713';
+  btn.disabled = true;
+
+  window.setTimeout(() => {
+    btn.dataset.busy = '0';
+    btn.textContent = 'Add to Cart';
+    btn.disabled = false;
+  }, 900);
 }
 
 function addToCart(id) {
@@ -278,14 +330,7 @@ function addToCart(id) {
   updateCartUI();
   showToast(`${p.name} added to cart`);
 
-  const clicked = document.querySelector(`.add-btn[data-id="${id}"]`);
-  if (clicked) {
-    clicked.textContent = 'Added \u2713';
-    const orig = clicked.textContent;
-    window.setTimeout(() => {
-      clicked.textContent = orig === 'Added \u2713' ? 'Add to Cart' : orig;
-    }, 900);
-  }
+  flashAdded(document.querySelector(`.add-btn[data-id="${id}"]`));
 }
 
 function changeQty(id, delta) {
@@ -321,20 +366,20 @@ function updateCartUI() {
     cartItemsEl.innerHTML = lines.map((line) => {
       return `
         <div class="cart-item">
-          <img src="${line.product.img}" alt="${line.product.name}" />
+          <img src="${line.product.img}" alt="${line.product.name}" width="66" height="82" loading="lazy" />
           <div class="cart-item-info">
             <span class="cart-item-name">${line.product.name}</span>
             <div class="qty-control">
-              <button class="qty-btn" data-action="minus" data-id="${line.id}" aria-label="Decrease quantity">&minus;</button>
+              <button class="qty-btn" data-action="minus" data-id="${line.id}" aria-label="Decrease quantity of ${line.product.name}"${line.qty <= 1 ? ' disabled' : ''}>&minus;</button>
               <span class="qty-value">${line.qty}</span>
-              <button class="qty-btn" data-action="plus" data-id="${line.id}" aria-label="Increase quantity">+</button>
+              <button class="qty-btn" data-action="plus" data-id="${line.id}" aria-label="Increase quantity of ${line.product.name}">+</button>
             </div>
           </div>
           <div class="cart-item-right">
             <span class="cart-item-price">${formatPrice(line.product.price)} each</span>
             <span class="cart-item-total">${formatPrice(line.product.price * line.qty)}</span>
           </div>
-          <button class="remove-btn" data-action="remove" data-id="${line.id}">Remove</button>
+          <button class="remove-btn" data-action="remove" data-id="${line.id}" aria-label="Remove ${line.product.name} from cart">Remove</button>
         </div>`;
     }).join('');
   }
@@ -349,18 +394,70 @@ function showToast(message) {
   toastTimeout = setTimeout(() => toastEl.classList.remove('show'), 2600);
 }
 
+// El carrito es un <dialog> modal: hay que mover el foco dentro, retenerlo
+// mientras está abierto y devolverlo al elemento de partida al cerrarlo.
+const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
+const pageRegions = ['.site-header', '.ticker', 'main', '.site-footer', '.skip-link']
+  .map((sel) => document.querySelector(sel))
+  .filter(Boolean);
+
+let lastFocused = null;
+
+function isCartOpen() {
+  return cartDrawer.classList.contains('open');
+}
+
 function openCart() {
+  lastFocused = document.activeElement;
+
   cartDrawer.classList.add('open');
   cartOverlay.classList.add('open');
-  cartDrawer.setAttribute('aria-hidden', 'false');
+  cartDrawer.inert = false;
   document.body.style.overflow = 'hidden';
+  pageRegions.forEach((el) => { el.inert = true; });
+
+  closeCartBtn.focus();
 }
 
 function closeCartDrawer() {
+  if (!isCartOpen()) return;
+
   cartDrawer.classList.remove('open');
   cartOverlay.classList.remove('open');
-  cartDrawer.setAttribute('aria-hidden', 'true');
+  cartDrawer.inert = true;
   document.body.style.overflow = '';
+  pageRegions.forEach((el) => { el.inert = false; });
+
+  // Si no sabemos de dónde veníamos (p. ej. se abrió con Enter o por
+  // código), devolvemos el foco al botón del carrito en vez de dejarlo
+  // perdido en el <body>.
+  const target = lastFocused && lastFocused !== document.body && typeof lastFocused.focus === 'function'
+    ? lastFocused
+    : cartBtn;
+
+  target.focus();
+  lastFocused = null;
+}
+
+// Mantiene el foco dentro del carrito mientras esté abierto.
+function trapFocus(e) {
+  if (e.key !== 'Tab' || !isCartOpen()) return;
+
+  const focusable = [...cartDrawer.querySelectorAll(FOCUSABLE)]
+    .filter((el) => el.offsetParent !== null);
+
+  if (focusable.length === 0) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
 }
 
 /* ------------------------------------------------------------
@@ -371,7 +468,13 @@ cartBtn.addEventListener('click', openCart);
 closeCartBtn.addEventListener('click', closeCartDrawer);
 cartOverlay.addEventListener('click', closeCartDrawer);
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeCartDrawer();
+  trapFocus(e);
+
+  if (e.key === 'Escape') {
+    // Primero se cierra el carrito; si no está abierto, el menú móvil.
+    if (isCartOpen()) closeCartDrawer();
+    else closeMenu();
+  }
 });
 
 cartItemsEl.addEventListener('click', (e) => {
@@ -393,10 +496,56 @@ checkoutBtn.addEventListener('click', () => {
   showToast('Checkout coming soon!');
 });
 
-window.addEventListener('resize', () => catalogs.forEach((c) => c.render()));
+// Al redimensionar solo repintamos (sin transición) y una vez por frame.
+// Antes se encolaba un setTimeout de 210 ms por cada pixel de arrastre.
+let resizeRaf = null;
+window.addEventListener('resize', () => {
+  if (resizeRaf) return;
+  resizeRaf = window.requestAnimationFrame(() => {
+    resizeRaf = null;
+    catalogs.forEach((c) => c.repaint());
+  });
+});
 
 /* ------------------------------------------------------------
-   8. INICIALIZACIÓN
+   8. SCROLL SPY (marca la sección activa del menú)
    ------------------------------------------------------------ */
 
+const navLinks = [...siteNav.querySelectorAll('a[href^="#"]')];
+
+if (navLinks.length && 'IntersectionObserver' in window) {
+  const sections = navLinks
+    .map((link) => document.querySelector(link.getAttribute('href')))
+    .filter(Boolean);
+
+  const visible = new Set();
+
+  const spy = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) visible.add(entry.target);
+        else visible.delete(entry.target);
+      });
+
+      // Si varias secciones se solapan, gana la primera en orden de lectura.
+      const active = sections.find((s) => visible.has(s));
+      if (!active) return;
+
+      navLinks.forEach((link) => {
+        const isActive = link.getAttribute('href') === `#${active.id}`;
+        if (isActive) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+    },
+    { rootMargin: '-45% 0px -50% 0px', threshold: 0 }
+  );
+
+  sections.forEach((s) => spy.observe(s));
+}
+
+/* ------------------------------------------------------------
+   9. INICIALIZACIÓN
+   ------------------------------------------------------------ */
+
+pruneCart();
 updateCartUI();

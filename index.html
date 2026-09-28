@@ -5,12 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="CUSTOM FASHION - Kids Fashion Collection. Modern and fun kids clothing." />
   <title>CUSTOM FASHION | Kids Fashion Collection</title>
+  <link rel="canonical" href="https://arlethdcs.github.io/" />
+  <meta name="theme-color" content="#e5006b" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="CUSTOM FASHION" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="CUSTOM FASHION | Kids Fashion Collection" />
+  <meta property="og:description" content="Modern and fun kids clothing. Two collections: Fashion 31 and More Colors." />
+  <meta property="og:url" content="https://arlethdcs.github.io/" />
+  <meta property="og:image" content="https://arlethdcs.github.io/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="CUSTOM FASHION kids fashion collection" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23ff5ca8%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%239b6dff%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22url(%23g)%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2244%22%20font-family%3D%22Verdana%2CGeneva%2Csans-serif%22%20font-size%3D%2230%22%20font-weight%3D%22bold%22%20fill%3D%22%23ffffff%22%20text-anchor%3D%22middle%22%3E31%3C%2Ftext%3E%3C%2Fsvg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
+  <a href="#main" class="skip-link">Skip to content</a>
 
   <!-- ================= ENCABEZADO ================= -->
   <header class="site-header">
@@ -61,7 +79,7 @@
 
     <div class="hero-content">
       <p class="hero-eyebrow">Kids Fashion Collection</p>
-      <h1 class="hero-title">CUSTOM <span class="hero-num">FASHION</span></h1>
+      <h1 class="hero-title">CUSTOM <span class="hero-accent">FASHION</span></h1>
       <p class="hero-slogan">Fun fashion for kids</p>
       <blockquote class="hero-quote">&ldquo;Be yourself. Wear your style.&rdquo;</blockquote>
       <a href="#collection" class="btn-primary">Shop Collection</a>
@@ -71,18 +89,23 @@
   <!-- ================= CINTA (ticker) ================= -->
   <div class="ticker" aria-hidden="true">
     <div class="ticker-track">
-      <span>New Drop</span><span>Free Shipping</span><span>Kids Styles</span><span>CUSTOM FASHION</span>
-      <span>New Drop</span><span>Free Shipping</span><span>Kids Styles</span><span>CUSTOM FASHION</span>
+      <div class="ticker-set">
+        <span>New Drop</span><span>Free Shipping</span><span>Kids Styles</span><span>CUSTOM FASHION</span>
+      </div>
+      <div class="ticker-set">
+        <span>New Drop</span><span>Free Shipping</span><span>Kids Styles</span><span>CUSTOM FASHION</span>
+      </div>
     </div>
   </div>
 
-  <main>
+  <main id="main">
 
     <!-- ================= COLECCIÓN ================= -->
     <section class="collection" id="collection">
       <div class="section-head">
         <div>
-          <h2 class="section-title">Custom Fashion Collection</h2>
+          <p class="panel-eyebrow">First Collection</p>
+          <h2 class="section-title">Fashion 31</h2>
           <p class="section-sub">Modern and comfortable pieces for your next outfit.</p>
         </div>
 
@@ -93,14 +116,14 @@
         </div>
       </div>
 
-      <div class="catalog-viewport" id="catalogViewport">
+      <div class="catalog-viewport" id="catalogViewport" aria-live="polite">
         <div class="catalog-grid" id="catalogGrid"></div>
       </div>
 
-      <div class="catalog-dots" id="catalogDots" aria-hidden="true"></div>
+      <div class="catalog-dots" id="catalogDots" role="group" aria-label="Fashion 31 pages"></div>
     </section>
 
-    <!-- ================= SEGUNDA COLECCIÓN: FASHION THEORY ONE ================= -->
+    <!-- ================= SEGUNDA COLECCIÓN: MORE COLORS ================= -->
     <section class="second-collection" id="colors">
       <div class="section-head">
         <div>
@@ -116,11 +139,11 @@
         </div>
       </div>
 
-      <div class="catalog-viewport" id="theoryViewport">
+      <div class="catalog-viewport" id="theoryViewport" aria-live="polite">
         <div class="catalog-grid" id="theoryGrid"></div>
       </div>
 
-      <div class="catalog-dots" id="theoryDots" aria-hidden="true"></div>
+      <div class="catalog-dots" id="theoryDots" role="group" aria-label="More Colors pages"></div>
     </section>
 
     <!-- ================= ABOUT ================= -->
@@ -143,6 +166,12 @@
 
   </main>
 
+  <noscript>
+    <div class="noscript-note">
+      <p><strong>This shop needs JavaScript.</strong> The collections are loaded dynamically, so please enable JavaScript to browse the pieces.</p>
+    </div>
+  </noscript>
+
   <footer class="site-footer">
     <p class="footer-brand">CUSTOM <span>FASHION</span></p>
     <p>Kids Fashion Collection &mdash; demo, we do not process real payments.</p>
@@ -151,9 +180,9 @@
   <!-- ================= CARRITO ================= -->
   <div id="cartOverlay" class="cart-overlay" aria-hidden="true"></div>
 
-  <aside id="cartDrawer" class="cart-drawer" aria-hidden="true" aria-label="Shopping cart">
+  <aside id="cartDrawer" class="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" inert>
     <div class="cart-drawer-header">
-      <h2>Shopping Cart</h2>
+      <h2 id="cartTitle">Shopping Cart</h2>
       <button id="closeCart" class="close-btn" aria-label="Close cart">&times;</button>
     </div>
 

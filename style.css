@@ -7,19 +7,25 @@
 :root {
   --ink: #2a2b45;
   --ink-soft: #55557a;
-  --muted: #8b8bb0;
+  --muted: #6b6b99;
   --paper: #ffffff;
   --bg-soft: #faf7ff;
   --line: #eee9fb;
 
   --pink: #ff5ca8;
-  --purple: #8b5cf6;
+  --purple: #8452f5;
   --blue: #3aa6ff;
   --yellow: #ffd23e;
   --mint: #2fd4a9;
 
   --grad: linear-gradient(100deg, #ff5ca8, #9b6dff);
   --grad-soft: linear-gradient(100deg, #ffb1d5, #cdb4ff);
+
+  /* Variantes oscuras: solo para superficies que llevan TEXTO BLANCO.
+     Ambos extremos dan 4.62:1 sobre blanco (WCAG AA).
+     --grad se reserva para lo decorativo (bordes, sombras, .hero-accent). */
+  --grad-strong: linear-gradient(100deg, #e5006b, #864eff);
+  --pink-strong: #e5006b;
 
   --radius: 20px;
   --shadow-soft: 0 8px 22px rgba(42, 43, 69, 0.08);
@@ -84,6 +90,27 @@ main {
   padding: 0 clamp(18px, 4vw, 44px);
 }
 
+/* ---------- Enlace para saltar al contenido ---------- */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  z-index: 200;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transform: translate(-50%, -160%);
+  transition: transform var(--transition);
+}
+
+.skip-link:focus-visible {
+  transform: translate(-50%, 0);
+}
+
 .section-title {
   font-size: clamp(1.55rem, 3.6vw, 2.2rem);
   letter-spacing: 0.2px;
@@ -138,7 +165,7 @@ main {
   font-weight: 700;
   font-size: 1.05rem;
   color: #fff;
-  background: var(--grad);
+  background: var(--grad-strong);
   padding: 2px 11px;
   border-radius: 999px;
   transform: rotate(-4deg);
@@ -165,6 +192,11 @@ main {
 .site-nav a:hover {
   color: var(--purple);
   background: var(--bg-soft);
+}
+
+.site-nav a[aria-current="page"] {
+  color: #fff;
+  background: var(--grad-strong);
 }
 
 .header-actions {
@@ -202,7 +234,7 @@ main {
   height: 21px;
   padding: 0 6px;
   border-radius: 999px;
-  background: var(--pink);
+  background: var(--pink-strong);
   color: #fff;
   font-size: 0.72rem;
   font-weight: 800;
@@ -334,7 +366,7 @@ main {
   line-height: 1;
 }
 
-.hero-num {
+.hero-accent {
   display: inline-block;
   color: #fff;
   background: var(--grad);
@@ -364,7 +396,7 @@ main {
   margin-top: 16px;
   padding: 16px 38px;
   border-radius: 999px;
-  background: var(--grad);
+  background: var(--grad-strong);
   color: #fff;
   font-weight: 800;
   font-size: 1.05rem;
@@ -388,16 +420,24 @@ main {
    ============================================================ */
 .ticker {
   overflow: hidden;
-  background: var(--grad);
+  background: var(--grad-strong);
   color: #fff;
   padding: 12px 0;
 }
 
+/* La pista se compone de DOS juegos idénticos. Cada .ticker-set mide
+   "4 spans + 4 huecos" (padding-right aporta el cuarto), así que ambas
+   mitades miden exactamente lo mismo y translateX(-50%) no produce salto. */
 .ticker-track {
   display: flex;
-  gap: 44px;
   width: max-content;
   animation: ticker 26s linear infinite;
+}
+
+.ticker-set {
+  display: flex;
+  gap: 44px;
+  padding-right: 44px;
 }
 
 .ticker-track span {
@@ -477,7 +517,6 @@ main {
 .catalog-viewport {
   overflow: hidden;
   touch-action: pan-y;
-  user-select: none;
 }
 
 .catalog-grid {
@@ -576,14 +615,23 @@ main {
   transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
 }
 
-.add-btn:hover {
-  background: var(--pink);
-  box-shadow: 0 10px 22px rgba(255, 92, 168, 0.4);
+.add-btn:hover:not(:disabled) {
+  background: var(--pink-strong);
+  box-shadow: 0 10px 22px rgba(229, 0, 107, 0.4);
   transform: translateY(-2px);
 }
 
 .add-btn:active {
   transform: scale(0.97);
+}
+
+.add-btn:disabled {
+  /* --mint es demasiado claro para texto blanco (1.89:1);
+     este verde da 4.61:1. */
+  background: #1b8469;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ---------- Puntos indicadores ---------- */
@@ -609,7 +657,7 @@ main {
 }
 
 /* ============================================================
-   SEGUNDA COLECCIÓN (Fashion Theory One)
+   SEGUNDA COLECCIÓN (More Colors)
    ============================================================ */
 .second-collection {
   margin-top: clamp(64px, 9vw, 96px);
@@ -639,7 +687,7 @@ main {
   overflow: hidden;
   margin-top: clamp(52px, 8vw, 80px);
   padding: clamp(34px, 5vw, 60px) clamp(22px, 4vw, 46px);
-  background: var(--grad);
+  background: var(--grad-strong);
   border-radius: var(--radius);
   color: #fff;
 }
@@ -702,12 +750,30 @@ main {
 
 .footer-brand span {
   color: #fff;
-  background: var(--grad);
+  background: var(--grad-strong);
   padding: 1px 12px;
   border-radius: 999px;
   display: inline-block;
   transform: rotate(-5deg);
   margin-left: 6px;
+}
+
+/* ============================================================
+   NOSCRIPT
+   ============================================================ */
+.noscript-note {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 clamp(18px, 4vw, 44px) 28px;
+}
+
+.noscript-note p {
+  padding: 18px 22px;
+  border: 1.5px solid #ffd1e6;
+  border-left: 5px solid var(--pink-strong);
+  border-radius: 14px;
+  background: #fff6fa;
+  color: var(--ink);
 }
 
 /* ============================================================
@@ -851,8 +917,13 @@ main {
   transition: background var(--transition), color var(--transition);
 }
 
-.qty-btn:hover {
+.qty-btn:hover:not(:disabled) {
   background: var(--bg-soft);
+}
+
+.qty-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .qty-value {
@@ -912,7 +983,7 @@ main {
 .checkout-btn {
   padding: 16px;
   border-radius: 14px;
-  background: var(--grad);
+  background: var(--grad-strong);
   color: #fff;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -1040,6 +1111,10 @@ main {
 
 /* Reduce movimiento si el usuario lo prefiere */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
