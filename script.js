@@ -31,7 +31,7 @@ const THEORY_PRODUCTS = [
   { id: 105, name: 'More Colors Bag',       price: 13.99, img: 'images/more-colors/bag.webp',        w: 668,  h: 886 },
   { id: 106, name: 'More Colors Cap',       price: 6.99,  img: 'images/more-colors/cap.jpg',         w: 194,  h: 259 },
   { id: 107, name: 'More Colors Waterproof', price: 17.99, img: 'images/more-colors/waterproof.jpg', w: 387,  h: 516 },
-  { id: 108, name: 'More Colors Deadem',    price: 13.99, img: 'images/more-colors/deadem.jpg',      w: 350,  h: 350 }
+  { id: 108, name: 'More Colors Diadem',    price: 13.99, img: 'images/more-colors/deadem.jpg',      w: 350,  h: 350 }
 ];
 
 const ALL_PRODUCTS = [...PRODUCTS, ...THEORY_PRODUCTS];
